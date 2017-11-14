@@ -1,13 +1,18 @@
 def conv_matrix(matrix, kernel):
-    output = np.zeros_like(matrix)
-    kernel_center = len(kernel) // 2
-    padded = np.pad(matrix, kernel_center, 'constant', constant_values=0)
+    output = np.ndarray(shape=matrix.shape)
+    kernel_height, kernel_width = kernel.shape
+    x_offset = kernel_width // 2
+    y_offset = kernel_height // 2
+    padding = np.maximum(x_offset, y_offset)
+    padded = np.pad(matrix, padding, 'constant', constant_values=0)
 
     for (y, row) in enumerate(matrix):
         for (x, value) in enumerate(row):
-            end_x = x + kernel_center * 2 + 1
-            end_y = y + kernel_center * 2 + 1
-            batch = padded[y:end_y, x:end_x]
+            start_x = x + padding - x_offset
+            start_y = y + padding - y_offset
+            end_x = x + padding + 1 + x_offset
+            end_y = y + padding + 1 + y_offset
+            batch = padded[start_y:end_y, start_x:end_x]
             multiplied = batch * kernel
             output[y][x] = np.sum(multiplied)
 
